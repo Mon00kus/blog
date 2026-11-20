@@ -1,59 +1,178 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<mcp align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></mcp>
+
+<h1 align="center">Blog - Laravel 13</h1>
 
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## 📖 About This Project
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Blog** is a modern blog application skeleton built with **Laravel 13**. It demonstrates core Laravel patterns including:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Blade templating with **blocks** for layout composition
+- MVC architecture with clear separation of concerns
+- Database migrations and Eloquent ORM
+- Routing and controllers
+- Session management with SQLite
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+This project is designed to be a starting point for building blog applications with Laravel, focusing on practical implementation patterns that are immediately useful.
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🚀 Quick Start
 
 ```bash
-composer require laravel/boost --dev
+# 1. Install dependencies
+composer install
+npm install --ignore-scripts
+npm run build
 
-php artisan boost:install
+# 2. Environment setup
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --force
+
+# 3. Start development server
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Visit `http://localhost:8000` to see the blog homepage.
 
-## Contributing
+## 🧩 Blade Blocks - Layout Composition
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Laravel's Blade templating engine uses **blocks** (via `@section` and `@show`/`@yield`) to enable layout composition. This is the fundamental pattern for building consistent page structures across your application.
 
-## Code of Conduct
+### Basic Pattern
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```blade
+<!-- resources/views/layouts/app.blade.php -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title') - Blog</title>
+</head>
+<body>
+    @include('components.header')
 
-## Security Vulnerabilities
+    <main class="container">
+        @yield('content')
+    </main>
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    @include('components.footer')
+</body>
+</html>
+```
 
-## License
+### Using Blocks in Pages
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# blog
+```blade
+<!-- resources/views/welcome.blade.php -->
+@extends('layouts.app')
+
+@section('title', 'Welcome to My Blog')
+
+@section('content')
+    <article>
+        <h1>{{ $post->title }}</h1>
+        <p>{{ $post->excerpt }}</p>
+        <a href="{{ route('posts.show', $post->slug) }}">Read more</a>
+    </article>
+@endsection
+```
+
+### Named Sections vs. Implicit Blocks
+
+- **`@section('name')`**: Explicitly named section (traditional approach)
+- **`@liveRegion`** (Livewire): Live region for partial updates
+- **Implicit blocks**: In modern Laravel, you can use `@sectionWithoutMarker` for cleaner syntax
+
+### Practical Blog Pattern
+
+```blade
+<!-- layouts/app.blade.php -->
+<html>
+    <body>
+        @stack('navigation')
+        @yield('content')
+        @push('scripts')
+            <script src="/js/app.js"></script>
+        @endpush
+    </body>
+</html>
+```
+
+```blade
+<!-- posts/show.blade.php -->
+@extends('layouts.app')
+
+@push('navigation')
+    <nav>
+        <a href="{{ route('home') }}">Home</a>
+    </nav>
+@endpush
+
+@section('content')
+    <h1>{{ $post->title }}</h1>
+    <div class="content-body">
+        {!! $post->body !!}
+    </div>
+@endsection
+```
+
+## 📁 Project Structure
+
+```
+blog/
+├── app/                    # Application code
+│   ├── Models/            # Eloquent models
+│   ├── Http/Controllers/  # Request handlers
+│   └── Providers/         # Service providers
+├── database/
+│   ├── migrations/        # Schema migrations
+│   └── seeders/           # Seed data
+├── resources/views/       # Blade templates
+│   ├── layouts/           # Layouts with blocks
+│   ├── components/        # Reusable components
+│   └── pages/             # Page content
+├── routes/web.php         # Route definitions
+└── composer.json          # Dependencies
+```
+
+## 🛠️ Development
+
+### Available Scripts
+
+```bash
+composer dev    # Start development server
+composer test   # Run PHPUnit tests
+npm run dev     # Vite development server
+```
+
+### Key Conventions
+
+- **PSR-4 autoloading**: `App\\` => `app/`
+- **Blade components**: Use `{{-- Component comment --}}` for disabled components
+- **Routes**: Defined in `routes/web.php` using RESTful resources
+- **Migrations**: Run `php artisan migrate` to update schema
+
+## 📚 Learning Laravel
+
+- [Laravel Documentation](https://laravel.com/docs/13.x) - Official reference
+- [Laravel Boost](https://laravel.com/docs/ai) - AI-assisted development tools
+- [Laracasts](https://laracasts.com) - Video tutorials
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/foo`)
+3. Commit your changes (`git commit -am 'Add foo'`)
+4. Push to the branch (`git push origin feature/foo`)
+5. Create a Pull Request
+
+## 📄 License
+
+This project is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
